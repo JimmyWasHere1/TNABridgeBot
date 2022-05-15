@@ -1,7 +1,8 @@
 class MessageHandler {
-  constructor(discord, command) {
+  constructor(discord, command, client) {
     this.discord = discord
     this.command = command
+    this.client = client
   }
 
   async onMessage(message) {
@@ -9,7 +10,7 @@ class MessageHandler {
       return
     }
 
-    if (this.command.handle(message)) {
+    if (this.command.handle(message, this.client)) {
       return
     }
 

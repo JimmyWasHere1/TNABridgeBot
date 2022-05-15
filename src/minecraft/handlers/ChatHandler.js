@@ -16,9 +16,15 @@ class StateHandler extends EventHandler {
 
   onMessage(event) {
     const message = event.toString().trim()
+    if (this.isNewApiKeyMessage(message)) {
+      this.minecraft.app.log.minecraft('Setting new api key...')
+      let apiKey = message.split(' ')
+      this.discord.app.config.minecraft.api_key = apiKey[apiKey.length-1]
+    }
 
     if (this.isLobbyJoinMessage(message)) {
       this.minecraft.app.log.minecraft('Sending Minecraft client to limbo')
+      this.discord.app.minecraft.bot.chat('/api new')
       return this.bot.chat('/ac §')
     }
 
@@ -84,7 +90,10 @@ class StateHandler extends EventHandler {
     if (this.isBlockedMessage(message)) {
       let blockedMsg = message.match(/".+"/g)[0].slice(1, -1)
 
-      return this.minecraft.broadcastCleanEmbed({ message: `Message \`${blockedMsg}\` blocked by Hypixel.`, color: 'DC143C' })
+      return this.minecraft.broadcastCleanEmbed({
+        message: `Message \`${blockedMsg}\` blocked by Hypixel.`,
+        color: 'DC143C'
+      })
     }
 
     if (this.isRepeatMessage(message)) {
@@ -96,7 +105,7 @@ class StateHandler extends EventHandler {
     }
 
     if (this.isIncorrectUsage(message)) {
-      return this.minecraft.broadcastCleanEmbed({ message: message.split("'").join("`"), color: 'DC143C' })
+      return this.minecraft.broadcastCleanEmbed({ message: message.split('\'').join('`'), color: 'DC143C' })
     }
 
     if (this.isOnlineInvite(message)) {
@@ -108,7 +117,10 @@ class StateHandler extends EventHandler {
     if (this.isOfflineInvite(message)) {
       let user = message.replace(/\[(.*?)\]/g, '').trim().split(/ +/g)[6].match(/\w+/g)[0]
 
-      return this.minecraft.broadcastCleanEmbed({ message: `${user} was offline invited to the guild!`, color: '47F049' })
+      return this.minecraft.broadcastCleanEmbed({
+        message: `${user} was offline invited to the guild!`,
+        color: '47F049'
+      })
     }
 
     if (this.isFailedInvite(message)) {
@@ -155,7 +167,10 @@ class StateHandler extends EventHandler {
     if (this.isLowestRank(message)) {
       let user = message.replace(/\[(.*?)\]/g, '').trim().split(' ')[0]
 
-      return this.minecraft.broadcastCleanEmbed({ message: `${user} is already the lowest guild rank!`, color: 'DC143C' })
+      return this.minecraft.broadcastCleanEmbed({
+        message: `${user} is already the lowest guild rank!`,
+        color: 'DC143C'
+      })
     }
 
     if (this.isAlreadyHasRank(message)) {
@@ -204,7 +219,7 @@ class StateHandler extends EventHandler {
     this.minecraft.broadcastMessage({
       username: username,
       message: playerMessage,
-      guildRank: guildRank,
+      guildRank: guildRank
     })
   }
 
@@ -214,6 +229,10 @@ class StateHandler extends EventHandler {
 
   isLobbyJoinMessage(message) {
     return (message.endsWith(' the lobby!') || message.endsWith(' the lobby! <<<')) && message.includes('[MVP+')
+  }
+
+  isNewApiKeyMessage(message) {
+    return (message.startsWith('You new API key is'))
   }
 
   isGuildMessage(message) {
@@ -257,7 +276,7 @@ class StateHandler extends EventHandler {
   }
 
   isNoPermission(message) {
-    return (message.includes('You must be the Guild Master to use that command!') || message.includes('You do not have permission to use this command!') || message.includes("I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.") || message.includes("You cannot mute a guild member with a higher guild rank!") || message.includes("You cannot kick this player!") || message.includes("You can only promote up to your own rank!") || message.includes("You cannot mute yourself from the guild!") || message.includes("is the guild master so can't be demoted!") || message.includes("is the guild master so can't be promoted anymore!")) && !message.includes(":")
+    return (message.includes('You must be the Guild Master to use that command!') || message.includes('You do not have permission to use this command!') || message.includes('I\'m sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.') || message.includes('You cannot mute a guild member with a higher guild rank!') || message.includes('You cannot kick this player!') || message.includes('You can only promote up to your own rank!') || message.includes('You cannot mute yourself from the guild!') || message.includes('is the guild master so can\'t be demoted!') || message.includes('is the guild master so can\'t be promoted anymore!')) && !message.includes(':')
   }
 
   isIncorrectUsage(message) {
@@ -273,7 +292,7 @@ class StateHandler extends EventHandler {
   }
 
   isFailedInvite(message) {
-    return (message.includes('is already in another guild!') || message.includes('You cannot invite this player to your guild!') || (message.includes("You've already invited") && message.includes("to your guild! Wait for them to accept!")) || message.includes('is already in your guild!')) && !message.includes(':')
+    return (message.includes('is already in another guild!') || message.includes('You cannot invite this player to your guild!') || (message.includes('You\'ve already invited') && message.includes('to your guild! Wait for them to accept!')) || message.includes('is already in your guild!')) && !message.includes(':')
   }
 
   isUserMuteMessage(message) {
@@ -293,7 +312,7 @@ class StateHandler extends EventHandler {
   }
 
   isSetrankFail(message) {
-    return message.includes("I couldn't find a rank by the name of ") && !message.includes(':')
+    return message.includes('I couldn\'t find a rank by the name of ') && !message.includes(':')
   }
 
   isAlreadyMuted(message) {
@@ -305,7 +324,7 @@ class StateHandler extends EventHandler {
   }
 
   isLowestRank(message) {
-    return message.includes("is already the lowest rank you've created!") && !message.includes(':')
+    return message.includes('is already the lowest rank you\'ve created!') && !message.includes(':')
   }
 
   isAlreadyHasRank(message) {

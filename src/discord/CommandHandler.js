@@ -1,9 +1,11 @@
 const fs = require('fs')
 const { Collection } = require('discord.js-light')
+const { MessageEmbed } = require('discord.js')
 
 class CommandHandler {
-  constructor(discord) {
+  constructor(discord, client) {
     this.discord = discord
+    this.client = client
 
     this.prefix = discord.app.config.discord.prefix
 
@@ -15,7 +17,7 @@ class CommandHandler {
     }
   }
 
-  handle(message) {
+  handle(message, client) {
     if (!message.content.startsWith(this.prefix)) {
       return false
     }
@@ -31,16 +33,16 @@ class CommandHandler {
     }
 
     if ((command.name != 'help' && !this.isCommander(message.member)) || (command.name == 'override' && !this.isOwner(message.author))) {
+      const replyEmbed = new MessageEmbed()
+      replyEmbed.setColor('DC143C')
+      replyEmbed.setTitle(`You don't have permission to do that.`)
       return message.channel.send({
-        embed: {
-          description: `You don't have permission to do that.`,
-          color: 'DC143C'
-        }
+        embeds: [replyEmbed]
       })
     }
 
     this.discord.app.log.discord(`[${command.name}] ${message.content}`)
-    command.onCommand(message)
+    command.onCommand(message, client)
 
     return true
   }

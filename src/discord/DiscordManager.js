@@ -3,6 +3,7 @@ const StateHandler = require('./handlers/StateHandler')
 const MessageHandler = require('./handlers/MessageHandler')
 const CommandHandler = require('./CommandHandler')
 const Discord = require('discord.js-light')
+const { Intents } = require('discord.js-light')
 
 class DiscordManager extends CommunicationBridge {
   constructor(app) {
@@ -11,21 +12,35 @@ class DiscordManager extends CommunicationBridge {
     this.app = app
 
     this.stateHandler = new StateHandler(this)
-    this.messageHandler = new MessageHandler(this, new CommandHandler(this))
+    this.messageHandler = new MessageHandler(this, new CommandHandler(this, this.client))
   }
 
   connect() {
+    const intents = [
+      "GUILD_MEMBERS",
+    ]
+    const allIntents = new Intents(9763)
     this.client = new Discord.Client({
       cacheGuilds: true,
       cacheChannels: true,
       cacheOverwrites: false,
       cacheRoles: true,
       cacheEmojis: false,
+      makeCache: Discord.Options.cacheWithLimits({
+        UserManager: 0
+      }),
       cachePresences: false,
+      intents: allIntents
     })
 
-    this.client.on('ready', () => this.stateHandler.onReady())
-    this.client.on('message', message => this.messageHandler.onMessage(message))
+
+
+    this.client.on('ready', () => {
+      this.stateHandler.onReady()
+    })
+    this.client.on('messageCreate', message => {
+      this.messageHandler.onMessage(message)
+    })
 
     this.client.login(this.app.config.discord.token).catch(error => {
       this.app.log.error(error)

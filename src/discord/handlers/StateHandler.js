@@ -1,3 +1,5 @@
+const { MessageEmbed } = require('discord.js')
+
 class StateHandler {
   constructor(discord) {
     this.discord = discord
@@ -12,23 +14,19 @@ class StateHandler {
     }
 
     this.discord.client.channels.fetch(this.discord.app.config.discord.channel).then(channel => {
-      channel.send({
-        embed: {
-          author: { name: `Chat Bridge is Online` },
-          color: '47F049'
-        }
-      })
+      const exampleEmbed = new MessageEmbed()
+      exampleEmbed.setColor('47F049')
+      exampleEmbed.setTitle('Chat Bridge is Online')
+      channel.send({embeds: [exampleEmbed]})
     })
   }
 
   onClose() {
     this.discord.client.channels.fetch(this.discord.app.config.discord.channel).then(channel => {
-      channel.send({
-        embed: {
-          author: { name: `Chat Bridge is Offline` },
-          color: 'F04947'
-        }
-      }).then(() => { process.exit() })
+      const exampleEmbed = new MessageEmbed()
+      exampleEmbed.setColor('F04947')
+      exampleEmbed.setTitle('Chat Bridge is Offline')
+      channel.send({embeds: [exampleEmbed]}).then(() => { process.exit() })
     }).catch(() => { process.exit() })
   }
 }
