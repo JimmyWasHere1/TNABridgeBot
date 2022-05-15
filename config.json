@@ -1,0 +1,35 @@
+{
+  "server": {
+    "host": "mc.hypixel.net",
+    "port": 25565
+  },
+  "minecraft": {
+    "username": "yourUsername",
+    "password": "yourPassword",
+    "lobbyHolder": "ignUsername",
+    "accountType": "mojang",
+    "api_key": "",
+    "bonzo": 7000,
+    "livid": 8000,
+    "necron": 9500,
+    "elite": 12000
+  },
+  "discord": {
+    "token": "",
+    "channel": "",
+    "commandRole": "",
+    "ownerId": "",
+    "prefix": "!",
+    "messageMode": "bot",
+    "guildID": "",
+    "bonzoRole": "",
+    "lividRole": "",
+    "necronRole": "",
+    "eliteRole": ""
+  },
+  "express": {
+    "enabled": false,
+    "port": 8880,
+    "authorization": "authorizationHeaderString"
+  }
+}
