@@ -40,7 +40,7 @@ class WeightCheckCommand extends DiscordCommand {
 
     if (!args[0]) {
       const invalidArgsEmbed = new MessageEmbed()
-      invalidArgsEmbed.setColor('F04947')
+      invalidArgsEmbed.setColor('#F04947')
       invalidArgsEmbed.setTitle('invalid args provided. Only \'all\' and \'@player\' available')
       message.channel.send({
         embeds: [invalidArgsEmbed]
@@ -48,9 +48,10 @@ class WeightCheckCommand extends DiscordCommand {
       return
     }
 
+
     if (args[0] !== 'all' && !args[0].startsWith('<@')) {
       const invalidArgsEmbed = new MessageEmbed()
-      invalidArgsEmbed.setColor('F04947')
+      invalidArgsEmbed.setColor('#F04947')
       invalidArgsEmbed.setTitle('invalid args provided. Only \'all\' and \'@player\' available')
       message.channel.send({
         embeds: [invalidArgsEmbed]
@@ -68,7 +69,7 @@ class WeightCheckCommand extends DiscordCommand {
 
     if (!userUUID) {
       const replyEmbed = new MessageEmbed()
-      replyEmbed.setColor('F04947')
+      replyEmbed.setColor('#F04947')
       replyEmbed.setTitle('User with this name is not found')
       message.channel.send({
         embeds: [replyEmbed]
@@ -104,15 +105,34 @@ class WeightCheckCommand extends DiscordCommand {
         discordMembers.push([member.id, nick])
       })
     }
-    this.getUserIDAndWeight(discordMembers)
+    this.getUserIDAndWeight(discordMembers, message)
   }
 
-  async getUserIDAndWeight(members) {
+  async getUserIDAndWeight(members, message) {
     let usersArray = []
+    const loadingEmbed = new MessageEmbed()
+    loadingEmbed.setColor('#FFFF00')
+    loadingEmbed.setTitle('Loading...')
+
+
+    const loadingMessage = await message.channel.send({
+      embeds: [loadingEmbed]
+    })
+    let dots = 1
+    const loadingAnimation = setInterval(() => {
+      const animationEmbed = new MessageEmbed()
+      animationEmbed.setColor('#FFFF00')
+      animationEmbed.setTitle('Loading' + '.'.repeat(dots))
+      loadingMessage.edit({
+        embeds: [animationEmbed]
+      })
+      dots++
+      if (dots > 3) dots = 1
+    }, 1000)
     const interval = setInterval(async () => {
       if (!members.length) {
         clearInterval(interval)
-        this.processGuildMembers(usersArray)
+        this.processGuildMembers(usersArray, loadingMessage, loadingAnimation)
       }
       let firstTen = members.splice(0, 10)
       for (const member of firstTen) {
@@ -127,10 +147,10 @@ class WeightCheckCommand extends DiscordCommand {
           usersArray.push(userInfo)
         })
       }
-    }, 6000)
+    }, 12000) //12 seconds for 10 members = 50 users or 100 requests /min
   }
 
-  async processGuildMembers(membersArray) {
+  async processGuildMembers(membersArray, message, loadingAnimation) {
     let anyoneChanged = false
     const ingameGuild = await fetch(`https://api.hypixel.net/guild?key=${this.discord.app.config.minecraft.api_key}&id=602915918ea8c9cb50ede5fd`).then(g => g.json())
     const guildMembers = ingameGuild.guild.members
@@ -284,11 +304,10 @@ class WeightCheckCommand extends DiscordCommand {
       returnEmbed.addField('No one got changed.', 'Wow!')
     }
 
-    this.discord.client.channels.fetch(this.discord.app.config.discord.channel).then(channel => {
-      channel.send({
-        embeds: [returnEmbed]
-      })
-    })
+    clearInterval(loadingAnimation)
+
+    message.edit({
+        embeds: [returnEmbed] })
   }
 
   async getWeight(userUUIDs) {
