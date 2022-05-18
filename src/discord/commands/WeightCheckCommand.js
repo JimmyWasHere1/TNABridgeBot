@@ -137,6 +137,7 @@ class WeightCheckCommand extends DiscordCommand {
       let firstTen = members.splice(0, 10)
       for (const member of firstTen) {
         this.getMinecraftUUID(member[1]).then(async uuid => {
+          if (!uuid) return
           let userInfo = {
             discordId: member[0],
             ign: member[1]
